@@ -1,0 +1,62 @@
+version: "2.3"
+
+services:
+    # If only the internal folder is provided, docker creates a string-named volume outside.
+    # Also creates the directory inside if it was non-existent.
+    data1:
+        build: ./empty
+        volumes:
+            - /data
+        tty: true
+    # Docker creates the named volume naming 'docker_my-vol' and populates it from the internal folder.
+    data2:
+        build: .
+        volumes:
+            - my-vol:/data
+        tty: true
+    # The content of the external folder overwrites the internal folder's content even if the external folder is empty.
+    data3:
+        build: .
+        volumes:
+            - ./datalocal:/data
+        tty: true
+    # The file from the external folder creates, or overwrites an already existing file of the same name in the internal folder.
+    # If neither of the file existing, docker thinks of it, and creates it as a directory in the internal workdir folder.
+    data4:
+        build: ./empty
+        volumes:
+            - ./datalocal/probafile.txt:/data/probafile.txt
+        tty: true
+    # This created a folder named '*' in the ./datalocal external folder, and created the /data internal folder, but it is empty.
+    data5:
+        build: ./empty
+        volumes:
+            - ./datalocal/*:/data
+        tty: true
+    # You can mount a named volume which created at a previous service (in this case, 'data2') to another one, 
+    # and it will see its content put here by the previous service, if the inner folder was empty.
+    # The files that were put here by 'data2' can be modified, except if the 'readonly' 
+    # (like 'my-vol:/data/:ro') argument was used.
+    # If the inner folder is not empty in the case of the second service, the content of the second (last) service overwrites
+    # the named volume's content, even if the access is 'readonly'.
+    data6:
+        build: ./empty
+        volumes:
+            - my-vol:/data/:ro
+        tty: true
+    # If an already existing, but empty named volume gets to be mounted, the content of the inner folder gets copied here.
+    # If the already existing, not empty named volume gets to be mounted, the content of the named volume overwrites (deletes) 
+    # the content of the inner folder.
+    data7:
+        build: .
+        volumes:
+            - datavol:/data
+        tty: true
+        
+
+# This section is needed when using named volumes.
+volumes:
+    my-vol:
+    datavol:
+        # This flag is needed if the volume to be used is already existing.
+        external: true
