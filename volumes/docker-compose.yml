@@ -28,11 +28,11 @@ services:
             - ./datalocal/probafile.txt:/data/probafile.txt
         tty: true
     # This created a folder named '*' in the ./datalocal external folder, and created the /data internal folder, but it is empty.
-    data5:
-        build: ./empty
-        volumes:
-            - ./datalocal/*:/data
-        tty: true
+    # data5:
+    #     build: ./empty
+    #     volumes:
+    #         - ./datalocal/*:/data
+    #     tty: true
     # You can mount a named volume which created at a previous service (in this case, 'data2') to another one, 
     # and it will see its content put here by the previous service, if the inner folder was empty.
     # The files that were put here by 'data2' can be modified, except if the 'readonly' 
